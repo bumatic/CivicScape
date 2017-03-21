@@ -1,9 +1,9 @@
 evaluation-notebooks
 ====================
 
-Bias Evaluation for CivicScape
+Evaluation for CivicScape
 
 What's Here
 -----------
 
--	`notebooks`: These are the python notebooks that illustrate the full bias check process.
+-	`notebooks`: These are the python notebooks that illustrate the full model inputs, deployment, metrics/evaluation, and bias check process.
