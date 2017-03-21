@@ -28,7 +28,7 @@ Event Census Tracts; Census tract of the crime or call for service event locatio
 Weather Forecasts; Temperature, precipitation, relative humidity, wind speed, change in all of these conditions; National Oceanic and Atmospheric Administration (NOAA) and forecast.io.
 
 #### Data Input Audit Notebook: How does CivicScape check for data quality?  
-CivicScape evaluates all data regularly before it is deployed in the model. Poor quality data, meaning data that is systematically missing observations or important categories, such as the date or time of an event, can inject bias into a model and result in inaccurate predictions. See our working whitepaper on bias in crime data for an overview of research about bias in crime data and the resulting implications for its use.  
+CivicScape evaluates all data regularly before it is deployed in the model. Poor quality data, meaning data that is systematically missing observations or important categories, such as the date or time of an event, can inject bias into a model and result in inaccurate predictions. Our forthcoming working whitepaper on bias in crime data will provide an overview of research about bias in crime data and the resulting implications for its use.  
 
 Our audits of all input data can be replicated by running our Data Input Audit Notebook available here on our Github page. 
 
