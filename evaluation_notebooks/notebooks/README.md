@@ -1,6 +1,6 @@
 # notebooks
 
-This directory contains the notebooks.
+This directory contains iPython notebooks with code for evaluation of models, data inputs, and deployment.
 
 To access, run Jupyter notebook within the directory containing these files:
 
