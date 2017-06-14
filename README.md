@@ -30,7 +30,8 @@ Temperature, precipitation, relative humidity, wind speed, change in all of thes
 **CivicScape evaluates all data regularly before it is deployed in the model**. Poor quality data, meaning data that is systematically missing observations or important categories, such as the date or time of an event, can inject bias into a model and result in inaccurate predictions. Our forthcoming working whitepaper on bias in crime data will provide an overview of research about bias in crime data and the resulting implications for its use.  
 
 **Our audits of all input data can be replicated** by running our Data Input Audit Notebook available here on our Github page.
-![Civicscape Map](./docs/map.png)
+
+![Civicscape Map](./docs/Map.PNG)
 
 ## Model
 Currently, CivicScape uses **an ensemble of feed-forward neural network models** tuned to the specific nature of crime data to understand patterns of crime across a city over time. Every model generates risk assessments for every area (roughly 3 block radius) of a jurisdiction at any a given hour, updated regularly based on slightly different initial conditions. The final risk assessment for each area that we use in CivicScape is a weighted average based on recent historical performance. A **patent is pending** on this work.
@@ -60,8 +61,6 @@ At CivicScape, we’re thinking hard about algorithms and how we evaluate their 
 
 #### Police Deployment Evaluation Notebook: How does CivicScape make police more efficient?
 Analytics can have substantial positive impact in **making police deployment more efficient**. Though every police department deploys officers in a different way, we make some assumptions that allow us to visualize and quantify the improvements in crime prevention that police in the right place at the right time can attain through the use of CivicScape.
-
-![Map](./docs/Gif-moving-around-the-screen.gif "Civicscape map")
 
 #### Bias Evaluation Notebook: How does CivicScape think about bias in crime prediction?
 We’re concerned not only with how well CivicScape anticipates crime, but also about how bias in crime data can result in disparate public safety outcomes within a community. The notebook Preventing Bias is an overview of bias in crime data and an evaluation the how **CivicScape aims to measure and does its best to remove problematic bias** that could drive incorrect risk assessments.
