@@ -1,5 +1,5 @@
 # [![Civicscape Logo](./docs/CivicScape-Logo-RGB-large.png)](https://www.civicscape.com)
-# Understanding the CivicScape data and model
+# Understanding the CrimeScape data and model
 ## What is this page?
 CivicScape is dedicated to using data and evidence-based research to help police **increase both the safety and trust** of the communities they serve. A key component of this commitment is making our analysis open and transparent, to enable trust and encourage constructive scrutiny where we can do better. CivicScape's tool, CrimeScape, is the only product with this level of transparency and accuracy.
 
@@ -11,7 +11,7 @@ We also share our interactive iPython Notebooks, where we aim to make it **easy 
 [![Police Deployment Notebook](./docs/Police-Deployment-notebook.png)](https://github.com/CivicScape/CivicScape/blob/master/evaluation_notebooks/notebooks/PoliceDeployment.ipynb) [![Bias in Crime Data Notebook](./docs/Bias-in-Crime-data-notebook.png)](https://github.com/CivicScape/CivicScape/blob/master/evaluation_notebooks/notebooks/PreventingBias.ipynb)
 
 ## Data
-CivicScape generates its risk assessments using data that is open and available to the public whenever possible. Though some jurisdictions choose to not make their crime data publicly available, all CivicScape data sources that are public can be accessed below:
+CrimeScape generates its risk assessments using data that is open and available to the public whenever possible. Though some jurisdictions choose to not make their crime data publicly available, all CrimeScape data sources that are public can be accessed below:
 
 #### Example Dataset; Variables used; Source
 
@@ -34,18 +34,18 @@ Temperature, precipitation, relative humidity, wind speed, change in all of thes
 ![Civicscape Map](./docs/Map.PNG)
 
 ## Model
-Currently, CivicScape uses **an ensemble of feed-forward neural network models** tuned to the specific nature of crime data to understand patterns of crime across a city over time. Every model generates risk assessments for every area (roughly 3 block radius) of a jurisdiction at any a given hour, updated regularly based on slightly different initial conditions. The final risk assessment for each area that we use in CivicScape is a weighted average based on recent historical performance. A **patent is pending** on this work.
+Currently, CrimeScape uses **an ensemble of feed-forward neural network models** tuned to the specific nature of crime data to understand patterns of crime across a city over time. Every model generates risk assessments for every area (roughly 3 block radius) of a jurisdiction at any a given hour, updated regularly based on slightly different initial conditions. The final risk assessment for each area that we use in CrimeScape is a weighted average based on recent historical performance. A **patent is pending** on this work.
 
 ### Our Model Differs from Previous Crime Models in Several Key Ways:
 1. We focus our model on **the information most useful for deployment**. CivicScape calculates not just the absolute chance of crime, but the **relative chance** for a given area at a given time compared to the rest of the city, so that officers are able to easily understand how to act on the information in **real time**.
 
-1. CivicScape analytics are trained to **recognize how quickly the landscape can change**. Our model has the unique capacity to analyze **changes in crime risk through time**, from one hour to the next. This is in part because we leverage information on how changes in the environment over a specific time period, such as the speed of changes in temperature, can impact the risk at any given area of the city.
+1. CrimeScape analytics are trained to **recognize how quickly the landscape can change**. Our model has the unique capacity to analyze **changes in crime risk through time**, from one hour to the next. This is in part because we leverage information on how changes in the environment over a specific time period, such as the speed of changes in temperature, can impact the risk at any given area of the city.
 
-1. We employ cutting edge science to **manage the sparsity of crime events**. In the eyes of an analyst, crime is a relatively rare event, and the model used to analyze it should be specifically tuned to this fact in order to perform accurately. CivicScape creates a dataset with a more balanced distribution of instances of crime and no-crime to allow for better understanding of the conditions under which crime does occur. This technique of decreasing the sampling rate of no-crime occurrences at an optimal rate is called sometimes called “**downsampling**”.
+1. We employ cutting edge science to **manage the sparsity of crime events**. In the eyes of an analyst, crime is a relatively rare event, and the model used to analyze it should be specifically tuned to this fact in order to perform accurately. CrimeScape creates a dataset with a more balanced distribution of instances of crime and no-crime to allow for better understanding of the conditions under which crime does occur. This technique of decreasing the sampling rate of no-crime occurrences at an optimal rate is called sometimes called “**downsampling**”.
 
-1. CivicScape models **only use reliable raw data**. Alongside our input data evaluation that **checks for missing or biased data** outlined in our code supplied, the model also employs numerous random subsets of the crime data that are then **each trained in a separate neural network**. This decreases the influence that problematic outliers or errors in the raw data may have on the neural network performance.
+1. CrimeScape models **only use reliable raw data**. Alongside our input data evaluation that **checks for missing or biased data** outlined in our code supplied, the model also employs numerous random subsets of the crime data that are then **each trained in a separate neural network**. This decreases the influence that problematic outliers or errors in the raw data may have on the neural network performance.
 
-#### Model Evaluation Metrics Notebook: How do CivicScape Models perform?
+#### Model Evaluation Metrics Notebook: How do CrimeScape Models perform?
 We evaluate our models using several different metrics. To start, we examine the relationship between recent crime events recorded and how often our model correctly anticipates or misses these events. These include (but are not limited to):
 - True Positive Rate: When a crime does happen, the percent of the time the model correctly anticipates it.
 - True Negative Rate: When a crime does not happen, percent of the time the model correctly anticipates that a crime would not happen.
@@ -59,10 +59,10 @@ Keeping with our **commitment to transparency**, in our Model Evaluation Metrics
 ## Evaluation
 At CivicScape, we’re thinking hard about algorithms and how we evaluate their impact beyond simply how accurately our models perform.
 
-#### Police Deployment Evaluation Notebook: How does CivicScape make police more efficient?
+#### Police Deployment Evaluation Notebook: How does CrimeScape make police more efficient?
 Analytics can have substantial positive impact in **making police deployment more efficient**. Though every police department deploys officers in a different way, we make some assumptions that allow us to visualize and quantify the improvements in crime prevention that police in the right place at the right time can attain through the use of CivicScape.
 
-#### Bias Evaluation Notebook: How does CivicScape think about bias in crime prediction?
-We’re concerned not only with how well CivicScape anticipates crime, but also about how bias in crime data can result in disparate public safety outcomes within a community. The notebook Preventing Bias is an overview of bias in crime data and an evaluation the how **CivicScape aims to measure and does its best to remove problematic bias** that could drive incorrect risk assessments.
+#### Bias Evaluation Notebook: How does CrimeScape think about bias in crime prediction?
+We’re concerned not only with how well CivicScape anticipates crime, but also about how bias in crime data can result in disparate public safety outcomes within a community. The notebook Preventing Bias is an overview of bias in crime data and an evaluation the how **CrimeScape aims to measure and does its best to remove problematic bias** that could drive incorrect risk assessments.
 
 We are constantly adding new work as we develop it. **Please weigh in** or watch our code on this page as we push out new information.
