@@ -1,4 +1,5 @@
 <a href="https://www.civicscape.com"><img src="https://4-x.github.io/CivicScape/logo.svg" width="50%" alt="Civicscape Logo"></a>
+
 # Understanding the CrimeScape data and model
 ## What is this page?
 CivicScape is dedicated to using data and evidence-based research to help police **increase both the safety and trust** of the communities they serve. A key component of this commitment is making our analysis open and transparent, to enable trust and encourage constructive scrutiny where we can do better. CivicScape's tool, CrimeScape, is the only product with this level of transparency and accuracy.
