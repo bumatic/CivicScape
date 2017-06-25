@@ -1,4 +1,5 @@
-# [![Civicscape Logo](./docs/CivicScape-Logo-RGB-large.png)](https://www.civicscape.com)
+<a href="https://www.civicscape.com"><img src="https://4-x.github.io/CivicScape/logo.svg" width="50%" alt="Civicscape Logo"></a>
+
 # Understanding the CrimeScape data and model
 ## What is this page?
 CivicScape is dedicated to using data and evidence-based research to help police **increase both the safety and trust** of the communities they serve. A key component of this commitment is making our analysis open and transparent, to enable trust and encourage constructive scrutiny where we can do better. CivicScape's tool, CrimeScape, is the only product with this level of transparency and accuracy.
@@ -7,8 +8,8 @@ Our methodology and code are available here on our Github page. To understand ou
 
 We also share our interactive iPython Notebooks, where we aim to make it **easy for you to find answers** to the following questions:
 
-[![Data Input Audit Notebook](./docs/Data-Input-Audit-Notebook.png)](https://github.com/CivicScape/CivicScape/blob/master/evaluation_notebooks/notebooks/DataInputsPractices.ipynb) [![Model Metrics Notebook](./docs/Model-Metrics-Notebook.png)](https://github.com/CivicScape/CivicScape/blob/master/evaluation_notebooks/notebooks/ModelDataPractices.ipynb)
-[![Police Deployment Notebook](./docs/Police-Deployment-notebook.png)](https://github.com/CivicScape/CivicScape/blob/master/evaluation_notebooks/notebooks/PoliceDeployment.ipynb) [![Bias in Crime Data Notebook](./docs/Bias-in-Crime-data-notebook.png)](https://github.com/CivicScape/CivicScape/blob/master/evaluation_notebooks/notebooks/PreventingBias.ipynb)
+<a href="https://github.com/CivicScape/CivicScape/blob/master/evaluation_notebooks/notebooks/DataInputsPractices.ipynb"><img src="https://4-x.github.io/CivicScape/1.svg" width="50%" alt="Data Input Audit Notebook"></a><a href="https://github.com/CivicScape/CivicScape/blob/master/evaluation_notebooks/notebooks/ModelDataPractices.ipynb"><img src="https://4-x.github.io/CivicScape/2.svg" width="50%" alt="Model Metrics Notebook"></a>
+<a href="https://github.com/CivicScape/CivicScape/blob/master/evaluation_notebooks/notebooks/PreventingBias.ipynb"><img src="https://4-x.github.io/CivicScape/3.svg" width="50%" alt="Bias in Crime Data Notebook"></a><a href="https://github.com/CivicScape/CivicScape/blob/master/evaluation_notebooks/notebooks/PoliceDeployment.ipynb"><img src="https://4-x.github.io/CivicScape/4.svg" width="50%" alt="Police Deployment Notebook"></a>
 
 ## Data
 CrimeScape generates its risk assessments using data that is open and available to the public whenever possible. Though some jurisdictions choose to not make their crime data publicly available, all CrimeScape data sources that are public can be accessed below:

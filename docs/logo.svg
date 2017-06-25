@@ -1,0 +1,72 @@
+<svg width="50%" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 90.29 42.98">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+
+      .cls-2 {
+        fill: #77b2db;
+      }
+
+      .cls-3 {
+        fill: #0081c3;
+      }
+
+      .cls-4 {
+        clip-path: url(#clip-path);
+      }
+
+      .cls-5 {
+        fill: #9e9a97;
+      }
+
+      .cls-6 {
+        fill: #635d59;
+      }
+    </style>
+    <clipPath id="clip-path" transform="translate(0 0)">
+      <rect class="cls-1" width="90.29" height="42.98"/>
+    </clipPath>
+  </defs>
+  <title>CivicScape-Logo-PMS-Uncoated</title>
+  <rect class="cls-2" x="0.64" y="21.94" width="11.26" height="6.05">
+    <animate attributeName="height" from="0" to="6.05" dur="0.5s" fill="freeze" />
+    <animate attributeName="y" from="27.99" to="21.94" dur="0.5s" fill="freeze" />
+  </rect>
+  <rect class="cls-3" x="13.71" y="15.89" width="11.26" height="12.09">
+    <animate attributeName="y" from="27.98" to="15.89" dur="0.5s" fill="freeze" />
+    <animate attributeName="height" from="0" to="12.09" dur="0.5s" fill="freeze" />
+  </rect>
+  <rect class="cls-2" x="26.77" y="9.85" width="11.26" height="18.14">
+    <animate attributeName="y" from="27.98" to="9.85" dur="0.5s" fill="freeze" />
+    <animate attributeName="height" from="0" to="18.14" dur="0.5s" fill="freeze" />
+  </rect>
+  <rect class="cls-2" x="79.03" y="21.42" width="11.26" height="6.56">
+    <animate attributeName="y" from="27.98" to="21.42" dur="0.5s" fill="freeze" />
+    <animate attributeName="height" from="0" to="6.56" dur="0.5s" fill="freeze" />
+  </rect>
+  <rect class="cls-3" x="65.97" y="8.03" width="11.26" height="19.95">
+    <animate attributeName="y" from="27.98" to="8.03" dur="0.5s" fill="freeze" />
+    <animate attributeName="height" from="0" to="19.95" dur="0.5s" fill="freeze" />
+  </rect>
+  <rect class="cls-2" x="52.9" y="15.89" width="11.26" height="12.09">
+    <animate attributeName="y" from="27.98" to="15.89" dur="0.5s" fill="freeze" />
+    <animate attributeName="height" from="0" to="12.09" dur="0.5s" fill="freeze" />
+  </rect>
+  <rect class="cls-3" x="39.84" width="11.26" height="27.98">
+    <animate attributeName="y" from="27.98" to="0" dur="0.5s" fill="freeze" />
+    <animate attributeName="height" from="0" to="27.98" dur="0.5s" fill="freeze" />
+  </rect>
+  <g class="cls-4">
+    <path opacity="0" class="cls-5" d="M82.86,42.82h7.43V40.91H85v-2h4.6V37H85V35h5.23V33.06H82.86ZM75.63,38V35h1.66c1.07,0,1.74.51,1.74,1.48v0A1.51,1.51,0,0,1,77.33,38Zm-2.15,4.83h2.15V39.89h1.63c2.19,0,3.94-1.17,3.94-3.43v0c0-2-1.41-3.37-3.73-3.37h-4ZM56.77,43a5,5,0,0,0,4-1.74L59.4,39.86A3.52,3.52,0,0,1,56.84,41,2.9,2.9,0,0,1,54,37.94v0a2.89,2.89,0,0,1,2.83-3A3.6,3.6,0,0,1,59.33,36L60.7,34.4a5,5,0,0,0-3.85-1.51,5,5,0,0,0-5.09,5v0a4.92,4.92,0,0,0,5,5M46.65,43c2.1,0,3.58-1.09,3.58-3v0c0-1.7-1.11-2.41-3.09-2.93-1.69-.43-2.1-.64-2.1-1.28v0c0-.47.43-.85,1.25-.85a4.58,4.58,0,0,1,2.54,1l1.11-1.62a5.64,5.64,0,0,0-3.62-1.24c-2,0-3.41,1.17-3.41,2.94v0c0,1.94,1.27,2.48,3.23,3,1.63.42,2,.7,2,1.24v0c0,.57-.53.92-1.41.92a4.48,4.48,0,0,1-2.91-1.18l-1.27,1.52A6.21,6.21,0,0,0,46.65,43" transform="translate(0 0)">
+          <animate attributeName="opacity" begin="0.75" from="0" to="1" dur="1.5s" fill="freeze" />
+    </path>
+    <path opacity="0" class="cls-6" d="M36.67,43a5,5,0,0,0,4-1.74L39.3,39.86A3.52,3.52,0,0,1,36.74,41a2.9,2.9,0,0,1-2.83-3.07v0a2.89,2.89,0,0,1,2.83-3A3.6,3.6,0,0,1,39.23,36L40.6,34.4a5,5,0,0,0-3.84-1.51,5,5,0,0,0-5.09,5v0a4.92,4.92,0,0,0,5,5m-9.27-.17h2.15V33.06H27.4Zm-7.92.07h1.9l3.94-9.82H23l-2.55,6.87-2.55-6.87H15.54Zm-8.36-.07h2.15V33.06H11.12ZM5,43a5,5,0,0,0,4-1.74L7.64,39.86A3.52,3.52,0,0,1,5.07,41a2.9,2.9,0,0,1-2.83-3.07v0a2.89,2.89,0,0,1,2.83-3A3.6,3.6,0,0,1,7.57,36L8.93,34.4A5,5,0,0,0,5.09,32.9a5,5,0,0,0-5.09,5v0a4.92,4.92,0,0,0,5,5" transform="translate(0 0)">
+                <animate attributeName="opacity" begin="0.5" from="0" to="1" dur="1.5s" fill="freeze" />
+    </path>
+  </g>
+  <polygon opacity="0" class="cls-5" points="65.86 33.01 61.91 42.83 64.22 42.83 66.78 35.96 69.33 42.83 71.69 42.83 67.75 33.01 65.86 33.01">
+              <animate attributeName="opacity" begin="0.75" from="0" to="1" dur="1.5s" fill="freeze" />
+  </polygon>
+</svg>
