@@ -1,82 +1,211 @@
 
 
+
 CREATE TABLE weather_import
 (
-wind_speed varchar(100),
-sealevel_pressure varchar(100),
-old_station_type varchar(100),
-station_type varchar(100),
-sky_condition varchar(100),
-wind_direction varchar(100),
-sky_condition_top varchar(100),
-visibility varchar(100),
-dttime timestamp without time zone,
-wind_direction_cardinal varchar(100),
-relative_humidity varchar(100),
-hourly_precip varchar(100),
-drybulb_fahrenheit varchar(100),
-report_type varchar(100),
-dewpoint_fahrenheit varchar(100),
-station_pressure varchar(100),
-weather_types varchar(500),
-wetbulb_fahrenheit varchar(100),
-wban_code integer
-) ;
+    hr timestamp 
+    , wind_speed decimal
+    , relative_humidity decimal
+    , hourly_precip decimal
+    , drybulb_fahrenheit decimal
+    , precip_probability decimal
+    , apparent_temperature decimal
+    , weather_type varchar(200)
+    , dew_point decimal
+    , wind_gust decimal
+    , wind_bearing decimal
+    , visibility decimal
+    , cloud_cover decimal
+    , pressure decimal
+
+) ; 
 
 
-CREATE INDEX ix_weather_i_station ON weather_import (wban_code, dttime);
-
-CREATE INDEX ix_weather_i_time ON weather_import (dttime, wind_speed, drybulb_fahrenheit, hourly_precip, relative_humidity, weather_types);
-
-CREATE TABLE weather_import_log
-(
-wind_speed varchar(100),
-sealevel_pressure varchar(100),
-old_station_type varchar(100),
-station_type varchar(100),
-sky_condition varchar(100),
-wind_direction varchar(100),
-sky_condition_top varchar(100),
-visibility varchar(100),
-dttime timestamp without time zone,
-wind_direction_cardinal varchar(100),
-relative_humidity varchar(100),
-hourly_precip varchar(100),
-drybulb_fahrenheit varchar(100),
-report_type varchar(100),
-dewpoint_fahrenheit varchar(100),
-station_pressure varchar(100),
-weather_types varchar(500),
-wetbulb_fahrenheit varchar(100),
-wban_code integer
-) ;
+CREATE INDEX ix_weather_i_time ON weather_import (hr, wind_speed, drybulb_fahrenheit, hourly_precip, relative_humidity, weather_type);
 
 
-CREATE UNIQUE INDEX ix_weather_log_station ON weather_import_log (wban_code, dttime);
-
-
-create table weather (
-	hr timestamp not null primary key
-	, wind_speed numeric(18,4)
-	, drybulb_fahrenheit numeric(18,4)
-	, hourly_precip numeric(18,4)
-	, relative_humidity numeric(18,4)
-	, fz int
-	, ra int
-	, ts int
-	, br int
-	, sn int
-	, hz int
-	, dz int
-	, pl int
-	, fg int
-	, sa int
-	, up int
-	, fu int
-	, sq int
-	, gs int
-
+CREATE TABLE all_weather (
+    hr timestamp not null primary key,
+    wind_speed numeric(18,4),
+    drybulb_fahrenheit numeric(18,4),
+    hourly_precip numeric(18,4),
+    relative_humidity numeric(18,4),
+    "temp_<_-20" integer,
+    "temp_-20_to_-11" integer,
+    "temp_-10_to_-1" integer,
+    temp_0_to_9 integer,
+    temp_10_to_19 integer,
+    temp_20_to_29 integer,
+    temp_30_to_39 integer,
+    temp_40_to_49 integer,
+    temp_50_to_59 integer,
+    temp_60_to_69 integer,
+    temp_70_to_79 integer,
+    temp_80_to_89 integer,
+    temp_90_to_99 integer,
+    temp_100_to_109 integer,
+    temp_110_to_119 integer,
+    "temp_>=_120" integer,
+    "wind_<_5" integer,
+    wind_5_to_9 integer,
+    wind_10_to_14 integer,
+    wind_15_to_19 integer,
+    wind_20_to_24 integer,
+    wind_25_to_29 integer,
+    wind_30_to_34 integer,
+    wind_35_to_39 integer,
+    wind_40_to_44 integer,
+    wind_45_to_49 integer,
+    "wind_>=_50" integer,
+    "rain_<_0" integer,
+    "rain_0.0_to_0.0999" integer,
+    "rain_0.125_to_0.2249" integer,
+    "rain_0.25_to_0.3499" integer,
+    "rain_0.375_to_0.4749" integer,
+    "rain_0.5_to_0.5999" integer,
+    "rain_0.625_to_0.7249" integer,
+    "rain_0.75_to_0.8499" integer,
+    "rain_0.875_to_0.9749" integer,
+    "rain_1.0_to_1.0999" integer,
+    "rain_>=_1" integer,
+    "humidity_<_10" integer,
+    humidity_10_to_19 integer,
+    humidity_20_to_29 integer,
+    humidity_30_to_39 integer,
+    humidity_40_to_49 integer,
+    humidity_50_to_59 integer,
+    humidity_60_to_69 integer,
+    humidity_70_to_79 integer,
+    humidity_80_to_89 integer,
+    humidity_90_to_99 integer,
+    "humidity_>=_100" integer,
+    "wow_1_change_=0" integer,
+    wow_1_change_1_to_5 integer,
+    wow_1_change_5_to_10 integer,
+    wow_1_change_10_to_20 integer,
+    wow_1_change_20_to_30 integer,
+    wow_1_change_30_to_40 integer,
+    wow_1_change_40_to_50 integer,
+    "wow_1_change_>50" integer,
+    wow_1_change_neg1_to_neg5 integer,
+    wow_1_change_neg5_to_neg10 integer,
+    wow_1_change_neg10_to_neg20 integer,
+    wow_1_change_neg20_to_neg30 integer,
+    wow_1_change_neg30_to_neg40 integer,
+    wow_1_change_neg40_to_neg50 integer,
+    "wow_1_change_>neg50" integer,
+    "wow_2_change_=0" integer,
+    wow_2_change_1_to_5 integer,
+    wow_2_change_5_to_10 integer,
+    wow_2_change_10_to_20 integer,
+    wow_2_change_20_to_30 integer,
+    wow_2_change_30_to_40 integer,
+    wow_2_change_40_to_50 integer,
+    "wow_2_change_>50" integer,
+    wow_2_change_neg1_to_neg5 integer, 
+    wow_2_change_neg5_to_neg10 integer,
+    wow_2_change_neg10_to_neg20 integer,
+    wow_2_change_neg20_to_neg30 integer,
+    wow_2_change_neg30_to_neg40 integer,
+    wow_2_change_neg40_to_neg50 integer,
+    "wow_2_change_>neg50" integer,
+    "dod_1_change_=0" integer,
+    dod_1_change_1_to_5 integer,
+    dod_1_change_5_to_10 integer,
+    dod_1_change_10_to_20 integer,
+    dod_1_change_20_to_30 integer,
+    dod_1_change_30_to_40 integer,
+    dod_1_change_40_to_50 integer,
+    "dod_1_change_>50" integer,
+    dod_1_change_neg1_to_neg5 integer,
+    dod_1_change_neg5_to_neg10 integer,
+    dod_1_change_neg10_to_neg20 integer,
+    dod_1_change_neg20_to_neg30 integer,
+    dod_1_change_neg30_to_neg40 integer,
+    dod_1_change_neg40_to_neg50 integer,
+    "dod_1_change_>neg50" integer,
+    "dod_2_change_=0" integer,
+    dod_2_change_1_to_5 integer,
+    dod_2_change_5_to_10 integer,
+    dod_2_change_10_to_20 integer,
+    dod_2_change_20_to_30 integer,
+    dod_2_change_30_to_40 integer,
+    dod_2_change_40_to_50 integer,
+    "dod_2_change_>50" integer,
+    dod_2_change_neg1_to_neg5 integer,
+    dod_2_change_neg5_to_neg10 integer,
+    dod_2_change_neg10_to_neg20 integer,
+    dod_2_change_neg20_to_neg30 integer,
+    dod_2_change_neg30_to_neg40 integer,
+    dod_2_change_neg40_to_neg50 integer,
+    "dod_2_change_>neg50" integer,
+    "dod_3_change_=0" integer,
+    dod_3_change_1_to_5 integer,
+    dod_3_change_5_to_10 integer,
+    dod_3_change_10_to_20 integer,
+    dod_3_change_20_to_30 integer,
+    dod_3_change_30_to_40 integer,
+    dod_3_change_40_to_50 integer,
+    "dod_3_change_>50" integer,
+    dod_3_change_neg1_to_neg5 integer,
+    dod_3_change_neg5_to_neg10 integer,
+    dod_3_change_neg10_to_neg20 integer,
+    dod_3_change_neg20_to_neg30 integer,
+    dod_3_change_neg30_to_neg40 integer,
+    dod_3_change_neg40_to_neg50 integer,
+    "dod_3_change_>neg50" integer,
+    "rain_1d_count_=0" integer,
+    rain_1d_count_1_to_5 integer,
+    rain_1d_count_5_to_10 integer,
+    rain_1d_count_10_to_20 integer,
+    rain_1d_count_20_to_24 integer,
+    "rain_2day_count_=0" integer,
+    rain_2day_count_1_to_5 integer,
+    rain_2day_count_5_to_10 integer,
+    rain_2day_count_10_to_20 integer,
+    rain_2day_count_20_to_24 integer,
+    rain_2day_count_24_to_30 integer,
+    rain_2day_count_30_to_36 integer,
+    rain_2day_count_37_to_47 integer,
+    rain_2day_count_48_to_57 integer,
+    rain_2day_count_58_to_65 integer,
+    rain_2day_count_66_to_72 integer,
+    "rain_1week_count_=0" integer,
+    rain_1week_count_1_to_5 integer,
+    rain_1week_count_5_to_10 integer,
+    rain_1week_count_10_to_20 integer,
+    rain_1week_count_20_to_24 integer,
+    rain_1week_count_24_to_30 integer,
+    rain_1week_count_30_to_36 integer,
+    rain_1week_count_37_to_47 integer,
+    rain_1week_count_48_to_57 integer,
+    rain_1week_count_58_to_65 integer,
+    rain_1week_count_66_to_72 integer,
+    rain_1week_count_73_to_96 integer,
+    rain_1week_count_97_to_120 integer,
+    rain_1week_count_121_to_144 integer,
+    rain_1week_count_145_to_168 integer,
+    "since_rain_count_=0" integer,
+    since_rain_count_1_to_5 integer,
+    since_rain_count_5_to_10 integer,
+    since_rain_count_10_to_20 integer,
+    since_rain_count_20_to_24 integer,
+    since_rain_count_24_to_30 integer,
+    since_rain_count_30_to_36 integer,
+    since_rain_count_37_to_47 integer,
+    since_rain_count_48_to_57 integer,
+    since_rain_count_58_to_65 integer,
+    since_rain_count_66_to_72 integer,
+    since_rain_count_73_to_96 integer,
+    since_rain_count_97_to_120 integer,
+    since_rain_count_121_to_144 integer,
+    since_rain_count_145_to_168 integer,
+    "since_rain_count_>168" integer
 );
 
-CREATE INDEX ix_weather_time ON weather (hr);
+
+CREATE INDEX ix_allweather_time ON all_weather (hr);
+CREATE INDEX ix_allweather_i_time ON weather_import (hr, wind_speed, drybulb_fahrenheit, hourly_precip, relative_humidity);
+
+
 
