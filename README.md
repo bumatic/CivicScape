@@ -66,5 +66,5 @@ Analytics can have substantial positive impact in **making police deployment mor
 #### Bias Evaluation Notebook: How does CrimeScape think about bias in crime prediction?
 We’re concerned not only with how well CivicScape anticipates crime, but also about how bias in crime data can result in disparate public safety outcomes within a community. The notebook Preventing Bias is an overview of bias in crime data and an evaluation the how **CrimeScape aims to measure and does its best to remove problematic bias** that could drive incorrect risk assessments.
 
-We are constantly adding new work as we develop it. **Please weigh in,** watch our code on this page as we push out new information, or [**contact us here.**] (https://civicscape.com)
+We are constantly adding new work as we develop it. **Please weigh in,** watch our code on this page as we push out new information, or [contact us here.] (https://civicscape.com)
 
