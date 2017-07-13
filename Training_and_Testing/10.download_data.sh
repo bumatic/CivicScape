@@ -3,54 +3,44 @@ code=$WC_TRAIN/10.Code
 work=$WC_JOB_DIR/10.work
 output=$WC_JOB_DIR/10.download_data
 
-mkdir -p $work $output
+##TODO: 
+#new weather format - pull over to other jurisdictions 
 
-download_weathers() {
+#CITY_ST_weather () {
+#OUTPUT_FILENAME=$output/weather.csv
+#lat={here}
+#lng={here}
+#Job_Dir=$output
 
-	for wban in $wbans; do
-	for year in `seq $end_year $start_year`; do
-	for month in `seq 12 1`; do
-		out_file="$work/$wban.$year.$month.json"
-		download_weather $wban $year $month $out_file
+#export OUTPUT_FILENAME=$WC_JOB_DIR/weather.csv
+#export lat={here}
+#export lng={here}
+#export Job_Dir=$output
+#export city=$WC_CITY
 
-		echo "out file $out_file"
-		file_size=`ls -l $out_file | awk '{print $5}'`
-		echo $file_size
-		if [ $file_size -gt 1024 ]; then
-			weather_json_to_obs ${out_file} ${out_file}.obs
-			json2csv -i ${out_file}.obs -k $weather_json_cols >> $weather_csv
-		fi
-		sleep .25
-	done
-	sleep 30
-	done
-	done
+####local  - 
+####python $CODE_SHARED/get_forecasts.py credshere $city $OUTPUT_FILENAME $lat $lng
+#python $code/get_forecasts.py $city $OUTPUT_FILENAME $lat $lng $Job_Dir
+#}
+
+
+philadelphia_pa_weather () {
+OUTPUT_FILENAME=$output/weather.csv
+lat=39.9526 
+lng=75.1652
+Job_Dir=$output
+
+export OUTPUT_FILENAME=$WC_JOB_DIR/weather.csv
+export lat=39.9526 
+export lng=75.1652
+export Job_Dir=$output
+export city=$WC_CITY
+
+#local  - 
+#python $CODE_SHARED/get_forecasts.py credshere $city $OUTPUT_FILENAME $lat $lng
+python $code/get_forecasts.py $city $OUTPUT_FILENAME $lat $lng $Job_Dir
 }
-download_weather() {
-	wban=$1
-	year=$2
-	month=$3
-	out_file=$4
-	#echo "downloading: ${wban} $year $month"
-	nextmonth=$(($month + 1))
-	nextyear=$year
-	if [ $nextmonth -eq 13 ]; then
-		nextmonth=1
-		nextyear=$(($year + 1))
-	fi
-	url="http://plenar.io/v1/api/weather/hourly/?wban_code=$wban&datetime__ge=$year-$month-01&datetime__lt=$nextyear-$nextmonth-01"
 
-	echo "Downloading weather to $out_file"
-	echo "curl -o $work/$wban.$year.$month.json $url"
-	curl -s -o $out_file "$url"
-	echo "Downloaded $(ls -lh $out_file | awk '{print $5}') "
-
-}
-weather_json_to_obs() {
-	obs_in_file=$1
-	obs_out_file=$2
-	jq -c '.objects[0].observations[]' $obs_in_file  > $obs_out_file
-}
 
 philadelphia_pa_crime() {
 	crime_csv=$output/philadelphia_crime.csv 
