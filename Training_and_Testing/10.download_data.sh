@@ -3,9 +3,6 @@ code=$WC_TRAIN/10.Code
 work=$WC_JOB_DIR/10.work
 output=$WC_JOB_DIR/10.download_data
 
-##TODO: 
-#new weather format - pull over to other jurisdictions 
-
 #CITY_ST_weather () {
 #OUTPUT_FILENAME=$output/weather.csv
 #lat={here}
@@ -42,6 +39,23 @@ python $code/get_forecasts.py $city $OUTPUT_FILENAME $lat $lng $Job_Dir
 }
 
 
+chicago_il_weather () {
+OUTPUT_FILENAME=$output/weather.csv
+lat=41.8781
+lng=87.6298
+Job_Dir=$output
+
+export OUTPUT_FILENAME=$WC_JOB_DIR/weather.csv
+export lat=41.8781 
+export lng=87.6298
+export Job_Dir=$output
+export city=$WC_CITY
+
+#local  - 
+#python $CODE_SHARED/get_forecasts.py credshere $city $OUTPUT_FILENAME $lat $lng
+python $code/get_forecasts.py $city $OUTPUT_FILENAME $lat $lng $Job_Dir
+}
+
 philadelphia_pa_crime() {
 	crime_csv=$output/philadelphia_crime.csv 
 	echo "Downloading crimes to $crime_csv"
@@ -60,7 +74,6 @@ philadelphia_pa_weather() {
 }
 
 philadelphia_pa_census() {
-	echo "Get Shapefile from Maggie"
 	#zip=$work/tracts.zip
 	#wget https://www.opendataphilly.org/dataset/census-tracts -O $zip
 	#unzip $zip -d $work
