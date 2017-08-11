@@ -1,7 +1,7 @@
 with crime_ones AS (
   select c.cell_id, date_trunc('hour',c.hr) as hr, SUM(COALESCE(  {{crime_sql}}  ,0)) as crime_count
   from crime c
-    INNER JOIN weather w ON date_trunc('hour',c.hr) = w.hr
+    INNER JOIN all_weather w ON date_trunc('hour',c.hr) = w.hr
   where c.hr between {{start_date_sql}}::timestamp and {{end_date_sql}}::timestamp
   and c.cell_id is not null
   and {{crime_sql}} > 0   
@@ -14,7 +14,7 @@ crime_zero_oversample_size AS (
     ( {{start_date_sql}} ::timestamp 
     , {{end_date_sql}} ::timestamp
     , '1 hour' ::interval) hourstart_series on 1=1
-  INNER JOIN weather w ON hourstart_series = w.hr
+  INNER JOIN all_weather w ON hourstart_series = w.hr
   order by random()
   limit (select 3 * count(1) from crime_ones)
 ),
@@ -23,17 +23,16 @@ crime_zeroes AS (
   from crime_zero_oversample_size z
   where (z.cell_id, z.hr) not in (select cell_id, hr from crime_ones) 
   order by random()
-  limit (select count(1) from crime_ones)
+  limit (select count(.5) from crime_ones)
 ),
 crime_balanced AS (
   select * from crime_ones
   union all
   select * from crime_zeroes
 ),
-
 crime_all AS (
 
-    select c.cell_id, hr_ser as hr, SUM(COALESCE(  {{crime_sql}}  ,0)) as crime_count
+    select cast(c.cell_id as integer), hr_ser as hr, SUM(COALESCE(  {{crime_sql}}  ,0)) as crime_count
     
     from cell_census_tract_bins c
     INNER JOIN generate_series 
@@ -41,45 +40,251 @@ crime_all AS (
     , {{end_date_sql}} ::timestamp
     , '1 hour' ::interval) hr_ser on 1=1
     left join crime cr
-        on c.cell_id = cr.cell_id and hr_ser = cr.hr
-    group by c.cell_id, hr_ser
+        on cast(c.cell_id as integer) = cast(cr.cell_id as integer) and hr_ser = cr.hr
+    group by cast(c.cell_id as integer), hr_ser
 ),
 
-weather_deltas AS (
-  select ts.ts as hr
-  , LAG(w.drybulb_fahrenheit, 24*1) OVER( order by ts.ts) as dod1_drybulb_fahrenheit
-  , LAG(w.drybulb_fahrenheit, 24*2) OVER( order by ts.ts) as dod2_drybulb_fahrenheit
-  , LAG(w.drybulb_fahrenheit, 24*3) OVER( order by ts.ts) as dod3_drybulb_fahrenheit
-  , LAG(w.drybulb_fahrenheit, 24*7*1) OVER( order by ts.ts) as wow1_drybulb_fahrenheit
-  , LAG(w.drybulb_fahrenheit, 24*7*2) OVER( order by ts.ts) as wow2_drybulb_fahrenheit
-  from generate_series 
-    ( {{start_date_sql}}::timestamp - INTERVAL '2 week'
-    , {{end_date_sql}}::timestamp
-    , '1 hour' ::interval) as ts
-  left join weather w on ts.ts = w.hr
-),
-hour_prec_history AS (
- select hourstart_series2
-  , sum (
-    case when w.hr between hourstart_series2 - INTERVAL '1 day' and hourstart_series2 then 1 else 0 end
-    ) as precip_hour_cnt_in_last_1_day
-  , sum (
-    case when w.hr between hourstart_series2 - INTERVAL '3 day' and hourstart_series2 then 1 else 0 end
-    ) as precip_hour_cnt_in_last_3_day
-  , sum (
-    case when w.hr between hourstart_series2 - INTERVAL '1 week' and hourstart_series2 then 1 else 0 end
-    ) as precip_hour_cnt_in_last_1_week
-  , EXTRACT(EPOCH FROM hourstart_series2 - max(w.hr))/3600 as hour_count_since_precip
-  from generate_series ( 
-      {{start_date_sql}} ::timestamp
-      , {{end_date_sql}} ::timestamp
-      , '1 hour' ::interval) hourstart_series2
-  inner join weather w on w.hr between hourstart_series2 - INTERVAL '8 week' and hourstart_series2
-  where w.hourly_precip > 0
-  group by hourstart_series2
+
+allcrime_history AS (
+select cell_id, hr,
+case when property_last_1_hour >=1 then 1 else 0 end as property_last_1_hour
+,case when property_last_2_hour >=1 then 1 else 0 end as property_last_2_hour
+,case when property_last_3_hour >=1 then 1 else 0 end as property_last_3_hour
+,case when property_last_4_hour >=1 then 1 else 0 end as property_last_4_hour
+,case when property_last_5_hour >=1 then 1 else 0 end as property_last_5_hour
+,case when property_last_1_day >=1 then 1 else 0 end as property_last_1_day
+,case when property_last_2_day >= 1 then 1 else 0 end as property_last_2_day
+,case when property_last_3_day >= 1 then 1 else 0 end as property_last_3_day
+,case when property_last_7_day >= 1 then 1 else 0 end as property_last_7_day
+,case when property_last_14_day >= 1 then 1 else 0 end as property_last_14_day
+
+,case when robbery_last_1_hour >=1 then 1 else 0 end as robbery_last_1_hour
+,case when robbery_last_2_hour >=1 then 1 else 0 end as robbery_last_2_hour
+,case when robbery_last_3_hour >=1 then 1 else 0 end as robbery_last_3_hour
+,case when robbery_last_4_hour >=1 then 1 else 0 end as robbery_last_4_hour
+,case when robbery_last_5_hour >=1 then 1 else 0 end as robbery_last_5_hour
+,case when robbery_last_1_day >=1 then 1 else 0 end as robbery_last_1_day
+,case when robbery_last_2_day >=1 then 1 else 0 end as robbery_last_2_day
+,case when robbery_last_3_day >=1 then 1 else 0 end as robbery_last_3_day
+,case when robbery_last_7_day >=1 then 1 else 0 end as robbery_last_7_day
+,case when robbery_last_14_day >=1 then 1 else 0 end as robbery_last_14_day
+
+,case when violent_last_1_hour >=1 then 1 else 0 end as violent_last_1_hour
+,case when violent_last_2_hour >=1 then 1 else 0 end as violent_last_2_hour
+,case when violent_last_3_hour >=1 then 1 else 0 end as violent_last_3_hour
+,case when violent_last_4_hour >=1 then 1 else 0 end as violent_last_4_hour
+,case when violent_last_5_hour >=1 then 1 else 0 end as violent_last_5_hour
+,case when violent_last_1_day >=1 then 1 else 0 end as violent_last_1_day
+,case when violent_last_2_day >=1 then 1 else 0 end as violent_last_2_day
+,case when violent_last_3_day >=1 then 1 else 0 end as violent_last_3_day
+,case when violent_last_7_day >=1 then 1 else 0 end as violent_last_7_day
+,case when violent_last_14_day >=1 then 1 else 0 end as violent_last_14_day
+
+,case when auto_last_1_hour >=1 then 1 else 0 end as auto_last_1_hour
+,case when auto_last_2_hour >=1 then 1 else 0 end as auto_last_2_hour
+,case when auto_last_3_hour >=1 then 1 else 0 end as auto_last_3_hour
+,case when auto_last_4_hour >=1 then 1 else 0 end as auto_last_4_hour
+,case when auto_last_5_hour >=1 then 1 else 0 end as auto_last_5_hour
+,case when auto_last_1_day >=1 then 1 else 0 end as auto_last_1_day
+,case when auto_last_2_day >=1 then 1 else 0 end as auto_last_2_day
+,case when auto_last_3_day >=1 then 1 else 0 end as auto_last_3_day
+,case when auto_last_7_day >=1 then 1 else 0 end as auto_last_7_day
+,case when auto_last_14_day >=1 then 1 else 0 end as auto_last_14_day
+
+from 
+(
+   select s.cell_id, s.hr, coalesce(c.property_count,0) as property_count
+  , coalesce(c.robbery_count,0) as robbery_count
+  , coalesce(c.violent_count,0) as violent_count
+
+   , coalesce(sum(c.property_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 2 PRECEDING AND 1 PRECEDING
+        ), 0) as property_last_1_hour
+   , coalesce(sum(c.property_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 3 PRECEDING AND 1 PRECEDING
+        ), 0) as property_last_2_hour
+   , coalesce(sum(c.property_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 4 PRECEDING AND 1 PRECEDING
+        ), 0) as property_last_3_hour
+   , coalesce(sum(c.property_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 5 PRECEDING AND 1 PRECEDING
+        ), 0) as property_last_4_hour
+   , coalesce(sum(c.property_count ) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 6 PRECEDING AND 1 PRECEDING
+        ), 0) as property_last_5_hour
+   , coalesce(sum(c.property_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 24 PRECEDING AND 1 PRECEDING
+        ), 0) as property_last_1_day
+   , coalesce(sum(c.property_count ) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 48 PRECEDING AND 1 PRECEDING
+        ), 0) as property_last_2_day
+    , coalesce(sum(c.property_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 72 PRECEDING AND 1 PRECEDING
+        ), 0) as property_last_3_day
+    , coalesce(sum(c.property_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 168 PRECEDING AND 1 PRECEDING
+        ),0) as property_last_7_day
+    , coalesce(sum(c.property_count) OVER (
+     PARTITION BY s.cell_id ORDER BY s.hr asc
+    ROWS BETWEEN 336 PRECEDING AND 1 PRECEDING
+    ),0) as property_last_14_day
+
+   , coalesce(sum(c.robbery_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 2 PRECEDING AND 1 PRECEDING
+        ), 0) as robbery_last_1_hour
+   , coalesce(sum(c.robbery_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 3 PRECEDING AND 1 PRECEDING
+        ), 0) as robbery_last_2_hour
+   , coalesce(sum(c.robbery_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 4 PRECEDING AND 1 PRECEDING
+        ), 0) as robbery_last_3_hour
+   , coalesce(sum(c.robbery_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 5 PRECEDING AND 1 PRECEDING
+        ), 0) as robbery_last_4_hour
+   , coalesce(sum(c.robbery_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 6 PRECEDING AND 1 PRECEDING
+        ), 0) as robbery_last_5_hour
+   , coalesce(sum(c.robbery_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 24 PRECEDING AND 1 PRECEDING
+        ), 0) as robbery_last_1_day
+   , coalesce(sum(c.robbery_count ) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 48 PRECEDING AND 1 PRECEDING
+        ), 0) as robbery_last_2_day
+    , coalesce(sum(c.robbery_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 72 PRECEDING AND 1 PRECEDING
+        ), 0) as robbery_last_3_day
+    , coalesce(sum(c.robbery_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 168 PRECEDING AND 1 PRECEDING
+        ),0) as robbery_last_7_day
+    , coalesce(sum(c.robbery_count) OVER (
+     PARTITION BY s.cell_id ORDER BY s.hr asc
+    ROWS BETWEEN 336 PRECEDING AND 1 PRECEDING
+    ),0) as robbery_last_14_day
+
+     , coalesce(sum(c.violent_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 2 PRECEDING AND 1 PRECEDING
+        ), 0) as violent_last_1_hour
+   , coalesce(sum(c.violent_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 3 PRECEDING AND 1 PRECEDING
+        ), 0) as violent_last_2_hour
+   , coalesce(sum(c.violent_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 4 PRECEDING AND 1 PRECEDING
+        ), 0) as violent_last_3_hour
+   , coalesce(sum(c.violent_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 5 PRECEDING AND 1 PRECEDING
+        ), 0) as violent_last_4_hour
+   , coalesce(sum(c.violent_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 6 PRECEDING AND 1 PRECEDING
+        ), 0) as violent_last_5_hour
+   , coalesce(sum(c.violent_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 24 PRECEDING AND 1 PRECEDING
+        ), 0) as violent_last_1_day
+   , coalesce(sum(c.violent_count ) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 48 PRECEDING AND 1 PRECEDING
+        ), 0) as violent_last_2_day
+    , coalesce(sum(c.violent_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 72 PRECEDING AND 1 PRECEDING
+        ), 0) as violent_last_3_day
+    , coalesce(sum(c.violent_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 168 PRECEDING AND 1 PRECEDING
+        ),0) as violent_last_7_day
+    , coalesce(sum(c.violent_count) OVER (
+     PARTITION BY s.cell_id ORDER BY s.hr asc
+    ROWS BETWEEN 336 PRECEDING AND 1 PRECEDING
+    ),0) as violent_last_14_day
+
+     , coalesce(sum(c.auto_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 2 PRECEDING AND 1 PRECEDING
+        ), 0) as auto_last_1_hour
+   , coalesce(sum(c.auto_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 3 PRECEDING AND 1 PRECEDING
+        ), 0) as auto_last_2_hour
+   , coalesce(sum(c.auto_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 4 PRECEDING AND 1 PRECEDING
+        ), 0) as auto_last_3_hour
+   , coalesce(sum(c.auto_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 5 PRECEDING AND 1 PRECEDING
+        ), 0) as auto_last_4_hour
+   , coalesce(sum(c.auto_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 6 PRECEDING AND 1 PRECEDING
+        ), 0) as auto_last_5_hour
+   , coalesce(sum(c.auto_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 24 PRECEDING AND 1 PRECEDING
+        ), 0) as auto_last_1_day
+   , coalesce(sum(c.auto_count ) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 48 PRECEDING AND 1 PRECEDING
+        ), 0) as auto_last_2_day
+    , coalesce(sum(c.auto_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 72 PRECEDING AND 1 PRECEDING
+        ), 0) as auto_last_3_day
+    , coalesce(sum(c.auto_count) OVER (
+        PARTITION BY s.cell_id ORDER BY s.hr asc
+        ROWS BETWEEN 168 PRECEDING AND 1 PRECEDING
+        ),0) as auto_last_7_day
+    , coalesce(sum(c.auto_count) OVER (
+     PARTITION BY s.cell_id ORDER BY s.hr asc
+    ROWS BETWEEN 336 PRECEDING AND 1 PRECEDING
+    ),0) as auto_last_14_day
+
+
+  from 
+  (
+    select c.cell_id, hourstart_series3 as hr
+  from generate_series (   {{start_date_sql}} ::timestamp , {{end_date_sql}} ::timestamp , '1 hour' ::interval) hourstart_series3
+    cross join cells c 
+  ) s
+  left join 
+  (
+      select cell_id, date_trunc('hour',hr) as hr, sum(property_count) as property_count
+      , sum(robbery_count) as robbery_count
+      , sum(violent_count) as violent_count
+      , sum(auto_count) as auto_count
+      from crime c 
+      where c.hr between {{start_date_sql}}::timestamp - INTERVAL '15 day' and  {{end_date_sql}}::timestamp
+      group by cell_id, date_trunc('hour',hr)
+      order by date_trunc('hour',hr)
+  ) c
+    on s.cell_id = c.cell_id and s.hr = c.hr
+) A
 )
 
-SELECT 
+ 
+SELECT
 c.cell_id, 
 cast(c.hr as date) as dt, 
 COALESCE(c.crime_count,0) as crime_count,
@@ -88,18 +293,10 @@ COALESCE(c.crime_count,0) as crime_count,
 
 date_part('year', c.hr)as year,
 date_part('hour', c.hr)as hournumber,
-w.*,
-wd.dod1_drybulb_fahrenheit,
-wd.dod2_drybulb_fahrenheit,
-wd.dod3_drybulb_fahrenheit,
-wd.wow1_drybulb_fahrenheit,
-wd.wow2_drybulb_fahrenheit,
-hour_prec_history.precip_hour_cnt_in_last_1_day,
-hour_prec_history.precip_hour_cnt_in_last_3_day,
-hour_prec_history.precip_hour_cnt_in_last_1_week,
-hour_prec_history.hour_count_since_precip,
-date_part('month', c.hr)as month_of_year,
+w.hr,w.wind_speed,w.drybulb_fahrenheit,w.hourly_precip,w.relative_humidity
+,date_part('month', c.hr)as month_of_year,
 extract(DOW FROM c.hr)as day_of_week
+
 
 /*note that monday is 1*/
 /* generate these from ${city}_cell_setup.sql */
@@ -976,17 +1173,280 @@ extract(DOW FROM c.hr)as day_of_week
  ,census_tra_823304   
  ,census_tra_840000   
 
+,property_last_1_hour
+,property_last_2_hour
+,property_last_3_hour
+,property_last_4_hour
+,property_last_5_hour
+,property_last_1_day
+,property_last_2_day
+,property_last_3_day
+,property_last_7_day
+,property_last_14_day
+
+,robbery_last_1_hour
+,robbery_last_2_hour
+,robbery_last_3_hour
+,robbery_last_4_hour
+,robbery_last_5_hour
+,robbery_last_1_day
+,robbery_last_2_day
+,robbery_last_3_day
+,robbery_last_7_day
+,robbery_last_14_day
+
+,violent_last_1_hour
+,violent_last_2_hour
+,violent_last_3_hour
+,violent_last_4_hour
+,violent_last_5_hour
+,violent_last_1_day
+,violent_last_2_day
+,violent_last_3_day
+,violent_last_7_day
+,violent_last_14_day
+
+  ,w."temp_<_-20" ,
+  w."temp_-20_to_-11" ,
+  w."temp_-10_to_-1" ,
+  w.temp_0_to_9 ,
+  w.temp_10_to_19 ,
+  w.temp_20_to_29 ,
+  w.temp_30_to_39 ,
+  w.temp_40_to_49 ,
+  w.temp_50_to_59 ,
+  w.temp_60_to_69 ,
+  w.temp_70_to_79 ,
+  w.temp_80_to_89 ,
+  w.temp_90_to_99 ,
+  w.temp_100_to_109 ,
+  w.temp_110_to_119,
+  w."temp_>=_120",
+  w."wind_<_5" ,
+  w.wind_5_to_9 ,
+  w.wind_10_to_14 ,
+  w.wind_15_to_19 ,
+  w.wind_20_to_24 ,
+  w.wind_25_to_29 ,
+  w.wind_30_to_34 ,
+  w.wind_35_to_39 ,
+  w.wind_40_to_44 ,
+  w.wind_45_to_49 ,
+  w."wind_>=_50" ,
+  w."rain_<_0" ,
+  w."rain_0.0_to_0.0999" ,
+  w."rain_0.125_to_0.2249" ,
+  w."rain_0.25_to_0.3499" ,
+  w."rain_0.375_to_0.4749" ,
+  w."rain_0.5_to_0.5999" ,
+  w."rain_0.625_to_0.7249" ,
+  w."rain_0.75_to_0.8499",
+  w."rain_0.875_to_0.9749" ,
+  w."rain_1.0_to_1.0999" ,
+  w."rain_>=_1" ,
+  w."humidity_<_10" ,
+  w.humidity_10_to_19 ,
+  w.humidity_20_to_29 ,
+  w.humidity_30_to_39 ,
+  w.humidity_40_to_49 ,
+  w.humidity_50_to_59 ,
+  w.humidity_60_to_69 ,
+  w.humidity_70_to_79 ,
+  w.humidity_80_to_89 ,
+  w.humidity_90_to_99 ,
+  w."humidity_>=_100" ,
+  w."wow_1_change_=0" ,
+  w.wow_1_change_1_to_5 ,
+w.wow_1_change_5_to_10 ,
+w.wow_1_change_10_to_20 ,
+w.wow_1_change_20_to_30 ,
+w.wow_1_change_30_to_40 ,
+w.wow_1_change_40_to_50 ,
+w."wow_1_change_>50" ,
+w.wow_1_change_neg1_to_neg5 ,
+w.wow_1_change_neg5_to_neg10 ,
+w.wow_1_change_neg10_to_neg20 ,
+w.wow_1_change_neg20_to_neg30 ,
+w.wow_1_change_neg30_to_neg40 ,
+w.wow_1_change_neg40_to_neg50 ,
+w."wow_1_change_>neg50" ,
+w."wow_2_change_=0" ,
+w.wow_2_change_1_to_5 ,
+w.wow_2_change_5_to_10 ,
+w.wow_2_change_10_to_20 ,
+w.wow_2_change_20_to_30 ,
+w.wow_2_change_30_to_40 ,
+w.wow_2_change_40_to_50 ,
+w."wow_2_change_>50" ,
+w.wow_2_change_neg1_to_neg5 ,
+w.wow_2_change_neg5_to_neg10 ,
+w.wow_2_change_neg10_to_neg20 ,
+w.wow_2_change_neg20_to_neg30 ,
+w.wow_2_change_neg30_to_neg40 ,
+w.wow_2_change_neg40_to_neg50 ,
+w."wow_2_change_>neg50" ,
+w."dod_1_change_=0" ,
+w.dod_1_change_1_to_5 ,
+w.dod_1_change_5_to_10 ,
+w.dod_1_change_10_to_20 ,
+w.dod_1_change_20_to_30 ,
+w.dod_1_change_30_to_40 ,
+w.dod_1_change_40_to_50 ,
+w."dod_1_change_>50" ,
+w.dod_1_change_neg1_to_neg5 ,
+w.dod_1_change_neg5_to_neg10 ,
+w.dod_1_change_neg10_to_neg20 ,
+w.dod_1_change_neg20_to_neg30 ,
+w.dod_1_change_neg30_to_neg40 ,
+w.dod_1_change_neg40_to_neg50 ,
+w."dod_1_change_>neg50" ,
+w."dod_2_change_=0" ,
+w.dod_2_change_1_to_5 ,
+w.dod_2_change_5_to_10 ,
+w.dod_2_change_10_to_20 ,
+w.dod_2_change_20_to_30 ,
+w.dod_2_change_30_to_40 ,
+w.dod_2_change_40_to_50 ,
+w."dod_2_change_>50" ,
+w.dod_2_change_neg1_to_neg5 ,
+w.dod_2_change_neg5_to_neg10 ,
+w.dod_2_change_neg10_to_neg20 ,
+w.dod_2_change_neg20_to_neg30 ,
+w.dod_2_change_neg30_to_neg40 ,
+w.dod_2_change_neg40_to_neg50 ,
+w."dod_2_change_>neg50" ,
+w."dod_3_change_=0" ,
+w.dod_3_change_1_to_5 ,
+w.dod_3_change_5_to_10 ,
+w.dod_3_change_10_to_20 ,
+w.dod_3_change_20_to_30 ,
+w.dod_3_change_30_to_40 ,
+w.dod_3_change_40_to_50 ,
+w."dod_3_change_>50" ,
+w.dod_3_change_neg1_to_neg5 ,
+w.dod_3_change_neg5_to_neg10 ,
+w.dod_3_change_neg10_to_neg20 ,
+w.dod_3_change_neg20_to_neg30 ,
+w.dod_3_change_neg30_to_neg40 ,
+w.dod_3_change_neg40_to_neg50 ,
+w."dod_3_change_>neg50" ,
+w."rain_1d_count_=0" ,
+w.rain_1d_count_1_to_5 ,
+w.rain_1d_count_5_to_10 ,
+w.rain_1d_count_10_to_20 ,
+w.rain_1d_count_20_to_24 ,
+w."rain_2day_count_=0" ,
+w.rain_2day_count_1_to_5 ,
+w.rain_2day_count_5_to_10 ,
+w.rain_2day_count_10_to_20 ,
+w.rain_2day_count_20_to_24 ,
+w.rain_2day_count_24_to_30 ,
+w.rain_2day_count_30_to_36 ,
+w.rain_2day_count_37_to_47 ,
+w.rain_2day_count_48_to_57 ,
+w.rain_2day_count_58_to_65 ,
+w.rain_2day_count_66_to_72 ,
+w."rain_1week_count_=0" ,
+w.rain_1week_count_1_to_5 ,
+w.rain_1week_count_5_to_10 ,
+w.rain_1week_count_10_to_20 ,
+w.rain_1week_count_20_to_24 ,
+w.rain_1week_count_24_to_30 ,
+w.rain_1week_count_30_to_36 ,
+w.rain_1week_count_37_to_47 ,
+w.rain_1week_count_48_to_57 ,
+w.rain_1week_count_58_to_65 ,
+w.rain_1week_count_66_to_72 ,
+w.rain_1week_count_73_to_96 ,
+w.rain_1week_count_97_to_120 ,
+w.rain_1week_count_121_to_144 ,
+w.rain_1week_count_145_to_168 ,
+w."since_rain_count_=0" ,
+w.since_rain_count_1_to_5 ,
+w.since_rain_count_5_to_10 ,
+w.since_rain_count_10_to_20 ,
+w.since_rain_count_20_to_24 ,
+w.since_rain_count_24_to_30 ,
+w.since_rain_count_30_to_36 ,
+w.since_rain_count_37_to_47 ,
+w.since_rain_count_48_to_57 ,
+w.since_rain_count_58_to_65 ,
+w.since_rain_count_66_to_72 ,
+w.since_rain_count_73_to_96 ,
+w.since_rain_count_97_to_120 ,
+w.since_rain_count_121_to_144 ,
+w.since_rain_count_145_to_168 
+
+
+
+  ,case when extract(dow from w.hr) = 2 then 1 else 0 end as day_of_week_2
+,case when extract(dow from w.hr) = 3 then 1 else 0 end as day_of_week_3
+,case when extract(dow from w.hr) = 4 then 1 else 0 end as day_of_week_4
+,case when extract(dow from w.hr) = 5 then 1 else 0 end as day_of_week_5
+,case when extract(dow from w.hr) = 6 then 1 else 0 end as day_of_week_6
+,case when extract(dow from w.hr) = 0 then 1 else 0 end as day_of_week_0
+,case when extract(dow from w.hr) = 1 then 1 else 0 end as day_of_week_1
+
+,case when extract(month from w.hr) = 1 then 1 else 0 end as month_of_year_1
+,case when extract(month from w.hr) = 2 then 1 else 0 end as month_of_year_2
+,case when extract(month from w.hr) = 3 then 1 else 0 end as month_of_year_3
+,case when extract(month from w.hr) = 4 then 1 else 0 end as month_of_year_4
+,case when extract(month from w.hr) = 5 then 1 else 0 end as month_of_year_5
+,case when extract(month from w.hr) = 6 then 1 else 0 end as month_of_year_6
+,case when extract(month from w.hr) = 7 then 1 else 0 end as month_of_year_7
+,case when extract(month from w.hr) = 8 then 1 else 0 end as month_of_year_8
+,case when extract(month from w.hr) = 9 then 1 else 0 end as month_of_year_9
+,case when extract(month from w.hr) = 10 then 1 else 0 end as month_of_year_10
+,case when extract(month from w.hr) = 11 then 1 else 0 end as month_of_year_11
+,case when extract(month from w.hr) = 12 then 1 else 0 end as month_of_year_12
+
+,case when extract(year from w.hr) = 2015 then 1 else 0 end as year_2015
+,case when extract(year from w.hr) = 2014 then 1 else 0 end as year_2014
+,case when extract(year from w.hr) = 2013 then 1 else 0 end as year_2013
+,case when extract(year from w.hr) = 2012 then 1 else 0 end as year_2012
+,case when extract(year from w.hr) = 2011 then 1 else 0 end as year_2011
+,case when extract(year from w.hr) = 2016 then 1 else 0 end as year_2016
+,case when extract(year from w.hr) = 2017 then 1 else 0 end as year_2017
+,case when extract(year from w.hr) = 2018 then 1 else 0 end as year_2018
+,case when extract(year from w.hr) = 2019 then 1 else 0 end as year_2019
+
+,case when extract(hour from w.hr) = 1 then 1 else 0 end as hournumber_1
+,case when extract(hour from w.hr) = 2 then 1 else 0 end as hournumber_2
+,case when extract(hour from w.hr) = 3 then 1 else 0 end as hournumber_3
+,case when extract(hour from w.hr) = 4 then 1 else 0 end as hournumber_4
+,case when extract(hour from w.hr) = 5 then 1 else 0 end as hournumber_5
+,case when extract(hour from w.hr) = 6 then 1 else 0 end as hournumber_6
+,case when extract(hour from w.hr) = 7 then 1 else 0 end as hournumber_7
+,case when extract(hour from w.hr) = 8 then 1 else 0 end as hournumber_8
+,case when extract(hour from w.hr) = 9 then 1 else 0 end as hournumber_9
+,case when extract(hour from w.hr) = 10 then 1 else 0 end as hournumber_10
+,case when extract(hour from w.hr) = 11 then 1 else 0 end as hournumber_11
+,case when extract(hour from w.hr) = 12 then 1 else 0 end as hournumber_12
+,case when extract(hour from w.hr) = 13 then 1 else 0 end as hournumber_13
+,case when extract(hour from w.hr) = 14 then 1 else 0 end as hournumber_14
+,case when extract(hour from w.hr) = 15 then 1 else 0 end as hournumber_15
+,case when extract(hour from w.hr) = 16 then 1 else 0 end as hournumber_16
+,case when extract(hour from w.hr) = 17 then 1 else 0 end as hournumber_17
+,case when extract(hour from w.hr) = 18 then 1 else 0 end as hournumber_18
+,case when extract(hour from w.hr) = 19 then 1 else 0 end as hournumber_19
+,case when extract(hour from w.hr) = 20 then 1 else 0 end as hournumber_20
+,case when extract(hour from w.hr) = 21 then 1 else 0 end as hournumber_21
+,case when extract(hour from w.hr) = 22 then 1 else 0 end as hournumber_22
+,case when extract(hour from w.hr) = 23 then 1 else 0 end as hournumber_23
+,case when extract(hour from w.hr) = 24 then 1 else 0 end as hournumber_24
+
+
 
 FROM 
 {{ crime_data_set }} c
 left join cell_census_tract_bins ct_bins
     on c.cell_id = ct_bins.cell_id
 
-INNER JOIN weather w ON c.hr = w.hr
-LEFT JOIN weather_deltas wd ON c.hr = wd.hr
+INNER JOIN all_weather w ON c.hr = w.hr
 
-left join hour_prec_history
-  on c.hr = hour_prec_history.hourstart_series2
+left join allcrime_history
+  on c.hr = allcrime_history.hr
+  and c.cell_id = allcrime_history.cell_id
 
 
 
