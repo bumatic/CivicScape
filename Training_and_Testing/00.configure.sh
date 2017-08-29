@@ -42,6 +42,7 @@ export WC_TEST_START="'2016-01-01'"
 export WC_TEST_END="'2016-12-31'"
 export R_NNET_HIDDEN_NODE_COUNT=35
 export R_NNET_ITER_COUNT=100
+export WC_DOWNSAMPLE_RATIO="2"
 
 # chicago
 export WC_CITY="chicago_il"
@@ -56,6 +57,7 @@ export WC_TEST_START="'2016-01-01'"
 export WC_TEST_END="'2016-12-31'"
 export R_NNET_HIDDEN_NODE_COUNT=35
 export R_NNET_ITER_COUNT=100
+export WC_DOWNSAMPLE_RATIO="1"
 
 
 # Dates
@@ -75,6 +77,7 @@ echo "wc_train: ${WC_TRAIN}" >> $yaml
 echo "wc_train_data: ${WC_TRAIN_DATA}" >> $yaml
 echo "wc_model_count: ${WC_MODEL_COUNT}" >> $yaml
 echo "wc_crimes: ${WC_CRIMES}" >> $yaml
+echo "wc_downsample_ratio: ${WC_DOWNSAMPLE_RATIO}" >> $yaml
 echo "wc_pg_db: ${WC_PG_DB}" >> $yaml
 
 mkdir -p $WC_TRAIN_DATA
