@@ -23,7 +23,7 @@ crime_zeroes AS (
   from crime_zero_oversample_size z
   where (z.cell_id, z.hr) not in (select cell_id, hr from crime_ones) 
   order by random()
-  limit (select count(.5) from crime_ones)
+  limit (select count(.5) / {{ downsample_ratio }} from crime_ones)
 ),
 crime_balanced AS (
   select * from crime_ones
