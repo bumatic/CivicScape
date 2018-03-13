@@ -42,12 +42,12 @@ python $code/get_forecasts.py $city $OUTPUT_FILENAME $lat $lng $Job_Dir
 chicago_il_weather () {
 OUTPUT_FILENAME=$output/weather.csv
 lat=41.8781
-lng=87.6298
+lng=-87.6298
 Job_Dir=$output
 
 export OUTPUT_FILENAME=$WC_JOB_DIR/weather.csv
 export lat=41.8781 
-export lng=87.6298
+export lng=-87.6298
 export Job_Dir=$output
 export city=$WC_CITY
 
@@ -64,13 +64,13 @@ philadelphia_pa_crime() {
 philadelphia_pa_weather() {
 
 	weather_csv=$output/${WC_CITY}_weather.csv
-	weather_json_cols="wind_speed,sealevel_pressure,old_station_type,station_type,sky_condition,wind_direction,sky_condition_top,visibility,datetime,wind_direction_cardinal,relative_humidity,hourly_precip,drybulb_fahrenheit,report_type,dewpoint_fahrenheit,station_pressure,weather_types,wetbulb_fahrenheit,wban_code"
+	#weather_json_cols="wind_speed,sealevel_pressure,old_station_type,station_type,sky_condition,wind_direction,sky_condition_top,visibility,datetime,wind_direction_cardinal,relative_humidity,hourly_precip,drybulb_fahrenheit,report_type,dewpoint_fahrenheit,station_pressure,weather_types,wetbulb_fahrenheit,wban_code"
 	echo $weather_json_cols > $weather_csv
 
-	wbans="13739"
-	start_year="2012"   # should be "2006"
-	end_year="2016"
-	download_weathers
+	#wbans="13739"
+	#start_year="2012"   # should be "2006"
+	#end_year="2016"
+	#download_weathers
 }
 
 philadelphia_pa_census() {
