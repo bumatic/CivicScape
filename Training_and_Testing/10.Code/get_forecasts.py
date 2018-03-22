@@ -19,7 +19,6 @@ with 0, e.g. wind speed.
 '''
 
 
-forecast_key = forecastiocreds.forecastio_key
 #print(forecastiocreds.forecastio_key)
 SECONDSPERHOUR = 3600
 #OUPUT_FILENAME = "lagged_forecasts.csv"
@@ -159,6 +158,10 @@ def getForecasts(lat, lng, forecast_key, city, Job_Dir, out_file):
     # Make sure the local timezone is used.
     localTime = current_time.astimezone(tz.timezone(timezone))
     df['prediction_timestamp'] = localTime.strftime('%b %d, %Y %H:%M')
+    local_tz=tz.timezone(timezone)
+    df.index = df['hr']
+    df['hr'] = df.index.tz_convert(local_tz)
+    df['prediction_timestamp'] = localTime.strftime('%b %d, %Y %H:%M')
     df[['hr','wind_speed','relative_humidity','hourly_precip','drybulb_fahrenheit' , 'precip_probability'
                             ,'apparent_temperature'
                             ,'weather_type'
@@ -230,10 +233,12 @@ if __name__ == "__main__":
         help="Longitude")
     parser.add_argument("Job_Dir", type=str,
         help="city data loader job directory")
+    parser.add_argument("forecast_key", type=str,
+        help="Forecast Key - get Dark Sky API key from from https://darksky.net/dev/register")
     args = parser.parse_args()
-
+    
    # with open(args.city + '/' + CREDFILE, 'r') as f:
     #    lat, lng, key = [x.strip() for x in f.readlines()]
 
-    main(args.lat, args.lng, forecast_key, args.city, args.Job_Dir, args.out_file)
+    main(args.lat, args.lng, args.forecast_key, args.city, args.Job_Dir, args.out_file)
     print("Completed Fetching Forecasts")

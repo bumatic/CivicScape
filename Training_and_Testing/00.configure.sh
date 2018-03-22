@@ -43,8 +43,10 @@ export WC_TEST_END="'2016-12-31'"
 export R_NNET_HIDDEN_NODE_COUNT=35
 export R_NNET_ITER_COUNT=100
 export WC_DOWNSAMPLE_RATIO="2"
+echo 'you will need to set the FORECAST_IO_KEY in the 00.configure.sh file to the API Key you retrieve from darksky.net here -> https://darksky.net/dev/register'
+export FORECAST_IO_KEY=''
 
-# chicago
+#chicago
 export WC_CITY="chicago_il"
 ##export WC_MODEL_COUNT=1
 #export WC_MODEL_COUNT=5
@@ -58,6 +60,8 @@ export WC_TEST_END="'2016-12-31'"
 export R_NNET_HIDDEN_NODE_COUNT=35
 export R_NNET_ITER_COUNT=100
 export WC_DOWNSAMPLE_RATIO="1"
+echo 'you will need to set the FORECAST_IO_KEY in the 00.configure.sh file to the API Key you retrieve from darksky.net here -> https://darksky.net/dev/register'
+export FORECAST_IO_KEY=''
 
 
 # Dates
