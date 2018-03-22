@@ -46,6 +46,7 @@ The first line sets the environment for our job. The second line executes a job 
 * WC_TEST_END= the end of our testing dataset 
 * R_NNET_HIDDEN_NODE_COUNT= the number of hidden node iterations used in the neural network algorithm
 * R_NNET_ITER_COUNT= the number of subsets of data and corresponding iterations of the neural network will factor into this model 
+* FORECAST_IO_KEY= set this variable to a Darky Sky API key you can retrieve for free here: https://darksky.net/dev/register
 
 After specifying the necessary crime, city and model set-up steps for the 00.configure.sh file, if we have existing data loaded and formatted, we are then ready to run the model. We would use .999.run_all.sh to run steps 30. through 140. in the Training pipeline directory, which is equivalent to running all remaining steps in teh creation of the model, including exporting  datasets, formatting variables, training models, testing them, and evaluating the final model metrics. The final output of each Training pipeline job are model metrics.
 
