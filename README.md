@@ -68,3 +68,4 @@ We’re concerned not only with how well CivicScape anticipates crime, but also 
 
 We are constantly adding new work as we develop it. **Please weigh in,** watch our code on this page as we push out new information, or [contact us here.](https://civicscape.com)
 
+
