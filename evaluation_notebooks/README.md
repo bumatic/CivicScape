@@ -1,7 +1,7 @@
 evaluation-notebooks
 ====================
 
-Evaluation for CivicScape
+Evaluation for CrimeScape
 
 What's Here
 -----------
